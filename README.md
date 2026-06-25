@@ -11,11 +11,11 @@ master et orchestrent le failover.
 
 ## Topologie
 
-| Rôle initial | Hôte     | IP              |
-|--------------|----------|-----------------|
-| master       | master   | 192.168.1.158   |
-| replica      | replica1 | 192.168.1.140   |
-| replica      | replica2 | 192.168.1.159   |
+| Rôle initial | Hôte     | IP            |
+| ------------ | -------- | ------------- |
+| master       | master   | 192.168.1.158 |
+| replica      | replica1 | 192.168.1.140 |
+| replica      | replica2 | 192.168.1.159 |
 
 > ⚠️ Les noms de groupes de l'inventaire reflètent les rôles **initiaux**. Après un
 > failover, l'hôte `master` peut tourner en réplica. Découvrez toujours le master
@@ -110,10 +110,10 @@ Architecture :
 
 Accès une fois déployé :
 
-| Service    | URL                              |
-|------------|----------------------------------|
-| Prometheus | `http://<monitoring_ip>:9090`    |
-| Grafana    | `http://<monitoring_ip>:3000`    |
+| Service    | URL                           |
+| ---------- | ----------------------------- |
+| Prometheus | `http://<monitoring_ip>:9090` |
+| Grafana    | `http://<monitoring_ip>:3000` |
 
 Versions épinglées dans `monitoring_playbook.yml` (`redis_exporter_version`,
 `prometheus_version`). Le téléchargement des binaires suppose un accès Internet sur les
@@ -124,12 +124,12 @@ hôtes et l'architecture `linux-amd64`.
 Ces valeurs sont codées en dur à plusieurs endroits (elles ne proviennent pas d'une
 source unique). En cas de changement, mettez-les à jour **partout** :
 
-| Valeur          | Playbook                       | Test (`client-python/main.py`) |
-|-----------------|--------------------------------|--------------------------------|
-| Nom du master   | `sentinel_master_name`         | `MASTER_NAME`                  |
-| Mot de passe    | `redis_password`               | `REDIS_PASSWORD`               |
-| IP des nœuds    | `inventory.ini` (`ansible_host`)| `SENTINELS` + listes de nœuds |
-| Ports           | `redis_port` / `sentinel_port` | `REDIS_PORT` / `26379`         |
+| Valeur        | Playbook                         | Test (`client-python/main.py`) |
+| ------------- | -------------------------------- | ------------------------------ |
+| Nom du master | `sentinel_master_name`           | `MASTER_NAME`                  |
+| Mot de passe  | `redis_password`                 | `REDIS_PASSWORD`               |
+| IP des nœuds  | `inventory.ini` (`ansible_host`) | `SENTINELS` + listes de nœuds  |
+| Ports         | `redis_port` / `sentinel_port`   | `REDIS_PORT` / `26379`         |
 
 > Dans `redis-sentinel.conf.j2`, la ligne `sentinel monitor` **doit** précéder
 > `sentinel auth-pass` (sinon Sentinel rejette l'auth pour un master inconnu).
@@ -139,3 +139,5 @@ source unique). En cas de changement, mettez-les à jour **partout** :
 `keygen/*.pem` sont des **clés SSH privées** versionnées dans le dépôt, et
 `redis_password` est un mot de passe en clair dans le playbook. Ce sont de vrais
 secrets : à faire tourner / retirer en priorité si le dépôt est partagé.
+
+``echo "compute ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/compute
