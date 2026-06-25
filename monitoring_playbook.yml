@@ -1,0 +1,249 @@
+---
+# =============================================================================
+# Playbook Ansible : Monitoring Redis HA — redis_exporter + Prometheus + Grafana
+# Compatible     : RHEL / CentOS / AlmaLinux 9
+# Usage          : ansible-playbook -i inventory.ini monitoring_playbook.yml
+# Prérequis      : redis_sentinel_playbook.yml déjà appliqué
+# =============================================================================
+
+# ── Play 1 : redis_exporter sur chaque nœud Redis ────────────────────────────
+- name: Monitoring — redis_exporter sur les nœuds Redis
+  hosts: redis_all
+  become: true
+  vars:
+    redis_port: 6379
+    redis_password: "Securep@55Here"
+    redis_exporter_version: "1.66.0"
+    redis_exporter_port: 9121
+
+  tasks:
+    - name: "[Exporter] Créer l'utilisateur système redis_exporter"
+      ansible.builtin.user:
+        name: redis_exporter
+        system: true
+        shell: /sbin/nologin
+        create_home: false
+
+    - name: "[Exporter] Télécharger et extraire redis_exporter"
+      ansible.builtin.unarchive:
+        src: "https://github.com/oliver006/redis_exporter/releases/download/v{{ redis_exporter_version }}/redis_exporter-v{{ redis_exporter_version }}.linux-amd64.tar.gz"
+        dest: /tmp
+        remote_src: true
+        creates: "/tmp/redis_exporter-v{{ redis_exporter_version }}.linux-amd64/redis_exporter"
+
+    - name: "[Exporter] Installer le binaire dans /usr/local/bin"
+      ansible.builtin.copy:
+        src: "/tmp/redis_exporter-v{{ redis_exporter_version }}.linux-amd64/redis_exporter"
+        dest: /usr/local/bin/redis_exporter
+        remote_src: true
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: "[Exporter] Déployer l'unité systemd"
+      ansible.builtin.template:
+        src: redis_exporter.service.j2
+        dest: /etc/systemd/system/redis_exporter.service
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Restart redis_exporter
+
+    - name: "[Exporter] Ouvrir le port redis_exporter dans le firewall"
+      ansible.posix.firewalld:
+        port: "{{ redis_exporter_port }}/tcp"
+        zone: public
+        permanent: true
+        immediate: true
+        state: enabled
+
+    - name: "[Exporter] Activer et démarrer redis_exporter"
+      ansible.builtin.systemd:
+        name: redis_exporter
+        enabled: true
+        state: started
+        daemon_reload: true
+
+  handlers:
+    - name: Restart redis_exporter
+      ansible.builtin.systemd:
+        name: redis_exporter
+        state: restarted
+        daemon_reload: true
+
+# ── Play 2 : Prometheus + Grafana sur l'hôte de monitoring ───────────────────
+- name: Monitoring — Prometheus + Grafana
+  hosts: monitoring
+  become: true
+  vars:
+    redis_exporter_port: 9121
+    prometheus_version: "2.54.1"
+    prometheus_port: 9090
+    grafana_port: 3000
+
+  tasks:
+
+    # ── Prometheus ────────────────────────────────────────────────────────────
+    - name: "[Prometheus] Créer l'utilisateur système prometheus"
+      ansible.builtin.user:
+        name: prometheus
+        system: true
+        shell: /sbin/nologin
+        create_home: false
+
+    - name: "[Prometheus] Créer les répertoires"
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: prometheus
+        group: prometheus
+        mode: '0755'
+      loop:
+        - /etc/prometheus
+        - /var/lib/prometheus
+
+    - name: "[Prometheus] Télécharger et extraire Prometheus"
+      ansible.builtin.unarchive:
+        src: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+        dest: /tmp
+        remote_src: true
+        creates: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/prometheus"
+
+    - name: "[Prometheus] Installer les binaires prometheus et promtool"
+      ansible.builtin.copy:
+        src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/{{ item }}"
+        dest: "/usr/local/bin/{{ item }}"
+        remote_src: true
+        owner: root
+        group: root
+        mode: '0755'
+      loop:
+        - prometheus
+        - promtool
+
+    - name: "[Prometheus] Installer consoles et console_libraries"
+      ansible.builtin.copy:
+        src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/{{ item }}/"
+        dest: "/etc/prometheus/{{ item }}/"
+        remote_src: true
+        owner: prometheus
+        group: prometheus
+        mode: '0644'
+      loop:
+        - consoles
+        - console_libraries
+
+    - name: "[Prometheus] Déployer la configuration (scrape des exporters)"
+      ansible.builtin.template:
+        src: prometheus.yml.j2
+        dest: /etc/prometheus/prometheus.yml
+        owner: prometheus
+        group: prometheus
+        mode: '0644'
+      notify: Restart prometheus
+
+    - name: "[Prometheus] Déployer l'unité systemd"
+      ansible.builtin.template:
+        src: prometheus.service.j2
+        dest: /etc/systemd/system/prometheus.service
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Restart prometheus
+
+    - name: "[Prometheus] Ouvrir le port Prometheus dans le firewall"
+      ansible.posix.firewalld:
+        port: "{{ prometheus_port }}/tcp"
+        zone: public
+        permanent: true
+        immediate: true
+        state: enabled
+
+    - name: "[Prometheus] Activer et démarrer prometheus"
+      ansible.builtin.systemd:
+        name: prometheus
+        enabled: true
+        state: started
+        daemon_reload: true
+
+    # ── Grafana ───────────────────────────────────────────────────────────────
+    - name: "[Grafana] Ajouter le dépôt YUM officiel"
+      ansible.builtin.yum_repository:
+        name: grafana
+        description: Grafana OSS
+        baseurl: https://rpm.grafana.com
+        gpgcheck: true
+        gpgkey: https://rpm.grafana.com/gpg.key
+        enabled: true
+
+    - name: "[Grafana] Installer grafana"
+      ansible.builtin.dnf:
+        name: grafana
+        state: present
+
+    - name: "[Grafana] Créer le répertoire des dashboards"
+      ansible.builtin.file:
+        path: /var/lib/grafana/dashboards
+        state: directory
+        owner: grafana
+        group: grafana
+        mode: '0755'
+
+    - name: "[Grafana] Provisionner la source de données Prometheus"
+      ansible.builtin.template:
+        src: grafana-datasource.yml.j2
+        dest: /etc/grafana/provisioning/datasources/prometheus.yml
+        owner: root
+        group: grafana
+        mode: '0640'
+      notify: Restart grafana
+
+    - name: "[Grafana] Provisionner le fournisseur de dashboards"
+      ansible.builtin.copy:
+        src: grafana-dashboard-provider.yml
+        dest: /etc/grafana/provisioning/dashboards/redis.yml
+        owner: root
+        group: grafana
+        mode: '0640'
+      notify: Restart grafana
+
+    - name: "[Grafana] Déployer le dashboard Redis"
+      ansible.builtin.copy:
+        src: redis-dashboard.json
+        dest: /var/lib/grafana/dashboards/redis.json
+        owner: grafana
+        group: grafana
+        mode: '0644'
+      notify: Restart grafana
+
+    - name: "[Grafana] Ouvrir le port Grafana dans le firewall"
+      ansible.posix.firewalld:
+        port: "{{ grafana_port }}/tcp"
+        zone: public
+        permanent: true
+        immediate: true
+        state: enabled
+
+    - name: "[Grafana] Activer et démarrer grafana-server"
+      ansible.builtin.systemd:
+        name: grafana-server
+        enabled: true
+        state: started
+
+    - name: "[Info] URLs d'accès"
+      ansible.builtin.debug:
+        msg:
+          - "Prometheus : http://{{ ansible_host }}:{{ prometheus_port }}"
+          - "Grafana    : http://{{ ansible_host }}:{{ grafana_port }} (admin / admin)"
+
+  handlers:
+    - name: Restart prometheus
+      ansible.builtin.systemd:
+        name: prometheus
+        state: restarted
+        daemon_reload: true
+
+    - name: Restart grafana
+      ansible.builtin.systemd:
+        name: grafana-server
+        state: restarted

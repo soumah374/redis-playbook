@@ -1,0 +1,19 @@
+# Géré par Ansible — redis_exporter sur {{ inventory_hostname }}
+[Unit]
+Description=Redis Exporter (Prometheus)
+After=network-online.target redis.service
+Wants=network-online.target
+
+[Service]
+User=redis_exporter
+Group=redis_exporter
+Type=simple
+Environment=REDIS_PASSWORD={{ redis_password }}
+ExecStart=/usr/local/bin/redis_exporter \
+  --redis.addr=redis://localhost:{{ redis_port }} \
+  --web.listen-address=:{{ redis_exporter_port }}
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

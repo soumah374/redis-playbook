@@ -1,0 +1,142 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 1,
+  "title": "Redis HA — Sentinel",
+  "uid": "redis-ha-sentinel",
+  "tags": ["redis", "sentinel"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "time": { "from": "now-1h", "to": "now" },
+  "refresh": "15s",
+  "templating": {
+    "list": [
+      {
+        "name": "instance",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "query": "label_values(redis_up, instance)",
+        "includeAll": true,
+        "multi": true,
+        "refresh": 2,
+        "current": { "text": "All", "value": "$__all" }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Redis Up",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }
+          ]
+        }
+      },
+      "targets": [
+        { "expr": "redis_up{instance=~\"$instance\"}", "legendFormat": "{{instance}}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Réplicas connectés au master",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "targets": [
+        { "expr": "max(redis_connected_slaves{instance=~\"$instance\"})", "refId": "A" }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Clients connectés (total)",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "targets": [
+        { "expr": "sum(redis_connected_clients{instance=~\"$instance\"})", "refId": "A" }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Ops/sec (total)",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "targets": [
+        { "expr": "sum(redis_instantaneous_ops_per_sec{instance=~\"$instance\"})", "refId": "A" }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "table",
+      "title": "Rôle des nœuds",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 4 },
+      "transformations": [
+        { "id": "labelsToFields", "options": {} },
+        { "id": "organize", "options": { "excludeByName": { "Time": true, "Value": true, "__name__": true, "job": true, "group": true } } }
+      ],
+      "targets": [
+        { "expr": "redis_instance_info{instance=~\"$instance\"}", "format": "table", "instant": true, "refId": "A" }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Mémoire utilisée",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 4 },
+      "fieldConfig": { "defaults": { "unit": "bytes" } },
+      "targets": [
+        { "expr": "redis_memory_used_bytes{instance=~\"$instance\"}", "legendFormat": "{{instance}}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Commandes traitées /sec",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 10 },
+      "targets": [
+        { "expr": "rate(redis_commands_processed_total{instance=~\"$instance\"}[5m])", "legendFormat": "{{instance}}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Clients connectés",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 10 },
+      "targets": [
+        { "expr": "redis_connected_clients{instance=~\"$instance\"}", "legendFormat": "{{instance}}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Clés par base (db0)",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 18 },
+      "targets": [
+        { "expr": "redis_db_keys{instance=~\"$instance\"}", "legendFormat": "{{instance}} {{db}}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "Hits / Misses du keyspace /sec",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 18 },
+      "targets": [
+        { "expr": "rate(redis_keyspace_hits_total{instance=~\"$instance\"}[5m])", "legendFormat": "hits {{instance}}", "refId": "A" },
+        { "expr": "rate(redis_keyspace_misses_total{instance=~\"$instance\"}[5m])", "legendFormat": "misses {{instance}}", "refId": "B" }
+      ]
+    }
+  ]
+}

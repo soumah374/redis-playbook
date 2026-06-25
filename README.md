@@ -25,8 +25,11 @@ master et orchestrent le failover.
 
 ```
 redis_sentinel_playbook.yml   Playbook principal (groupe redis_all)
-inventory.ini                 Inventaire : redis_master, redis_replicas, redis_all
+monitoring_playbook.yml       Stack monitoring (redis_exporter + Prometheus + Grafana)
+inventory.ini                 Inventaire : redis_master, redis_replicas, redis_all, monitoring
 redis-sentinel.conf.j2        Template Jinja2 → /etc/redis/sentinel.conf
+templates/                    Templates du monitoring (.service, prometheus.yml, datasource)
+files/                        Dashboard Grafana + provisioning statique
 client-python/main.py         Test d'intégration du cluster (9 vérifications)
 keygen/*.pem                  Clés SSH privées des nœuds
 ```
@@ -82,6 +85,39 @@ Les 9 vérifications s'exécutent séquentiellement : connexions directes, conne
 Sentinel, découverte master/réplicas, écriture/lecture, rôles et état de la réplication.
 Il n'y a pas de runner pour un test unique — importez le module et appelez la fonction
 `test_*()` voulue pour l'isoler.
+
+## Monitoring (Prometheus + Grafana)
+
+Stack de supervision déployée par `monitoring_playbook.yml`, à appliquer **après** le
+playbook principal :
+
+```bash
+ansible-playbook -i inventory.ini monitoring_playbook.yml
+```
+
+Architecture :
+
+- **redis_exporter** (port `9121`) sur chacun des 3 nœuds Redis — expose les métriques
+  Redis, s'authentifie avec `redis_password`. Installé en binaire + service systemd.
+- **Prometheus** (port `9090`) sur l'hôte `[monitoring]` — scrape automatiquement les
+  exporters de tous les hôtes du groupe `redis_all` (cible générée depuis l'inventaire).
+- **Grafana** (port `3000`, login par défaut `admin` / `admin`) sur l'hôte
+  `[monitoring]` — source de données Prometheus et dashboard Redis provisionnés
+  automatiquement (`files/redis-dashboard.json`).
+
+> Renseignez l'IP de l'hôte de monitoring dans `inventory.ini` (groupe `[monitoring]`,
+> placeholder `192.168.1.160`).
+
+Accès une fois déployé :
+
+| Service    | URL                              |
+|------------|----------------------------------|
+| Prometheus | `http://<monitoring_ip>:9090`    |
+| Grafana    | `http://<monitoring_ip>:3000`    |
+
+Versions épinglées dans `monitoring_playbook.yml` (`redis_exporter_version`,
+`prometheus_version`). Le téléchargement des binaires suppose un accès Internet sur les
+hôtes et l'architecture `linux-amd64`.
 
 ## Invariants inter-fichiers
 

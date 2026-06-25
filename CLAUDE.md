@@ -26,6 +26,11 @@ ansible-playbook -i inventory.ini redis_sentinel_playbook.yml --check --diff
 ansible-playbook -i inventory.ini redis_sentinel_playbook.yml -vvv
 ```
 
+Deploy the monitoring stack (run AFTER the main playbook):
+```bash
+ansible-playbook -i inventory.ini monitoring_playbook.yml
+```
+
 Run the cluster integration test (requires network reach to the nodes):
 ```bash
 cd client-python
@@ -55,6 +60,16 @@ individual `test_*()` function.
 - **`redis-sentinel.conf.j2`** — Jinja2 template rendered to `/etc/redis/sentinel.conf`
   on every node. Order matters: `sentinel monitor` MUST precede `sentinel auth-pass`
   (Sentinel rejects auth-pass for an unknown master otherwise).
+
+- **`monitoring_playbook.yml`** — two plays. Play 1 (`redis_all`) installs
+  `redis_exporter` (binary + systemd, port 9121) on every Redis node, authenticating to
+  local Redis via `redis_password`. Play 2 (`monitoring` group) installs Prometheus
+  (binary + systemd, port 9090) and Grafana (RPM repo, port 3000). Prometheus scrape
+  targets are generated from `groups['redis_all']` in `templates/prometheus.yml.j2`, so
+  adding a Redis node to the inventory is automatically picked up. Grafana's datasource
+  and the Redis dashboard (`files/redis-dashboard.json`) are provisioned on disk — no
+  manual UI setup. Templated configs live in `templates/`, static provisioning in
+  `files/`.
 
 - **`client-python/main.py`** — operational smoke test. Connection details
   (`SENTINELS`, `MASTER_NAME`, `REDIS_PASSWORD`, node IPs) are hardcoded near the top
