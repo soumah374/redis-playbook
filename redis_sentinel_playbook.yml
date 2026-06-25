@@ -30,7 +30,7 @@
 
     - name: "[Dépôts] Installer le dépôt Remi"
       ansible.builtin.dnf:
-        name: "https://rpms.remirepo.net/enterprise/remi-release-8.rpm"
+        name: "https://rpms.remirepo.net/enterprise/remi-release-9.rpm"
         state: present
         disable_gpg_check: true
 
@@ -38,8 +38,8 @@
       ansible.builtin.command: dnf module reset -y redis
       changed_when: false
 
-    - name: "[Dépôts] Activer le module Redis remi-6.2"
-      ansible.builtin.command: dnf module enable -y redis:remi-6.2
+    - name: "[Dépôts] Activer le module Redis remi-7.2"
+      ansible.builtin.command: dnf module enable -y redis:remi-7.2
       changed_when: false
 
     # ── Étape 2 : Installation ────────────────────────────────────────────────
@@ -53,8 +53,8 @@
 
     - name: "[Redis] Sauvegarder la configuration originale"
       ansible.builtin.copy:
-        src: /etc/redis.conf
-        dest: /etc/redis.conf.orig
+        src: /etc/redis/redis.conf
+        dest: /etc/redis/redis.conf.orig
         remote_src: true
         force: false
         owner: redis
@@ -63,32 +63,32 @@
 
     - name: "[Redis] Bind sur toutes les interfaces"
       ansible.builtin.lineinfile:
-        path: /etc/redis.conf
+        path: /etc/redis/redis.conf
         regexp: '^bind .*'
         line: 'bind 0.0.0.0'
 
     - name: "[Redis] Désactiver le mode protégé"
       ansible.builtin.lineinfile:
-        path: /etc/redis.conf
+        path: /etc/redis/redis.conf
         regexp: '^protected-mode .*'
         line: 'protected-mode no'
 
     - name: "[Redis] Définir requirepass"
       ansible.builtin.lineinfile:
-        path: /etc/redis.conf
+        path: /etc/redis/redis.conf
         regexp: '^#?\s*requirepass .*'
         line: "requirepass {{ redis_password }}"
 
     - name: "[Redis] Définir masterauth"
       ansible.builtin.lineinfile:
-        path: /etc/redis.conf
+        path: /etc/redis/redis.conf
         regexp: '^#?\s*masterauth .*'
         line: "masterauth {{ redis_password }}"
         insertafter: 'requirepass'
 
     - name: "[Redis] Configurer replicaof sur les réplicas"
       ansible.builtin.lineinfile:
-        path: /etc/redis.conf
+        path: /etc/redis/redis.conf
         regexp: '^#?\s*replicaof .*'
         line: "replicaof {{ master_ip }} {{ redis_port }}"
       when: inventory_hostname in groups['redis_replicas']
@@ -97,8 +97,8 @@
 
     - name: "[Sentinel] Sauvegarder la configuration originale"
       ansible.builtin.copy:
-        src: /etc/redis-sentinel.conf
-        dest: /etc/redis-sentinel.conf.orig
+        src: /etc/redis/sentinel.conf
+        dest: /etc/redis/sentinel.conf.orig
         remote_src: true
         force: false
         owner: redis
@@ -108,7 +108,7 @@
     - name: "[Sentinel] Déployer la configuration Sentinel sur le master"
       ansible.builtin.template:
         src: redis-sentinel.conf.j2
-        dest: /etc/redis-sentinel.conf
+        dest: /etc/redis/sentinel.conf
         owner: redis
         group: redis
         mode: '0640'
@@ -119,7 +119,7 @@
     - name: "[Sentinel] Déployer la configuration Sentinel sur les réplicas"
       ansible.builtin.template:
         src: redis-sentinel.conf.j2
-        dest: /etc/redis-sentinel.conf
+        dest: /etc/redis/sentinel.conf
         owner: redis
         group: redis
         mode: '0640'
@@ -146,6 +146,7 @@
       notify: Reload firewalld
 
     # ── Étape 6 : Services ────────────────────────────────────────────────────
+
     - name: "[Service] Activer et démarrer redis.service"
       ansible.builtin.systemd:
         name: redis
