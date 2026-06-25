@@ -1,0 +1,199 @@
+---
+# =============================================================================
+# Playbook Ansible : Redis Haute Disponibilité avec Sentinel
+# Compatible     : CentOS 8 / RHEL 8
+# Usage          : ansible-playbook -i inventory.ini redis_sentinel_playbook.yml
+# =============================================================================
+
+- name: Redis HA avec Sentinel — Installation complète
+  hosts: redis_all
+  become: true
+  vars:
+    redis_port: 6379
+    sentinel_port: 26379
+    redis_password: "Securep@55Here"
+    sentinel_master_name: "computemaster"
+    sentinel_quorum: 2
+    down_after_ms: 5000
+    failover_timeout: 180000
+    parallel_syncs: 1
+    master_ip: "{{ hostvars[groups['redis_master'][0]]['ansible_host'] }}"
+
+  tasks:
+
+    # ── Étape 1 : Dépôts ──────────────────────────────────────────────────────
+
+    - name: "[Dépôts] Installer epel-release"
+      ansible.builtin.dnf:
+        name: epel-release
+        state: present
+
+    - name: "[Dépôts] Installer le dépôt Remi"
+      ansible.builtin.dnf:
+        name: "https://rpms.remirepo.net/enterprise/remi-release-8.rpm"
+        state: present
+        disable_gpg_check: true
+
+    - name: "[Dépôts] Réinitialiser le module Redis"
+      ansible.builtin.command: dnf module reset -y redis
+      changed_when: false
+
+    - name: "[Dépôts] Activer le module Redis remi-6.2"
+      ansible.builtin.command: dnf module enable -y redis:remi-6.2
+      changed_when: false
+
+    # ── Étape 2 : Installation ────────────────────────────────────────────────
+
+    - name: "[Installation] Installer redis (redis-server + redis-sentinel + redis-cli)"
+      ansible.builtin.dnf:
+        name: redis
+        state: present
+
+    # ── Étape 3 : Configuration Redis ─────────────────────────────────────────
+
+    - name: "[Redis] Sauvegarder la configuration originale"
+      ansible.builtin.copy:
+        src: /etc/redis.conf
+        dest: /etc/redis.conf.orig
+        remote_src: true
+        force: false
+        owner: redis
+        group: redis
+        mode: '0640'
+
+    - name: "[Redis] Bind sur toutes les interfaces"
+      ansible.builtin.lineinfile:
+        path: /etc/redis.conf
+        regexp: '^bind .*'
+        line: 'bind 0.0.0.0'
+
+    - name: "[Redis] Désactiver le mode protégé"
+      ansible.builtin.lineinfile:
+        path: /etc/redis.conf
+        regexp: '^protected-mode .*'
+        line: 'protected-mode no'
+
+    - name: "[Redis] Définir requirepass"
+      ansible.builtin.lineinfile:
+        path: /etc/redis.conf
+        regexp: '^#?\s*requirepass .*'
+        line: "requirepass {{ redis_password }}"
+
+    - name: "[Redis] Définir masterauth"
+      ansible.builtin.lineinfile:
+        path: /etc/redis.conf
+        regexp: '^#?\s*masterauth .*'
+        line: "masterauth {{ redis_password }}"
+        insertafter: 'requirepass'
+
+    - name: "[Redis] Configurer replicaof sur les réplicas"
+      ansible.builtin.lineinfile:
+        path: /etc/redis.conf
+        regexp: '^#?\s*replicaof .*'
+        line: "replicaof {{ master_ip }} {{ redis_port }}"
+      when: inventory_hostname in groups['redis_replicas']
+
+    # ── Étape 4 : Configuration Sentinel ──────────────────────────────────────
+
+    - name: "[Sentinel] Sauvegarder la configuration originale"
+      ansible.builtin.copy:
+        src: /etc/redis-sentinel.conf
+        dest: /etc/redis-sentinel.conf.orig
+        remote_src: true
+        force: false
+        owner: redis
+        group: redis
+        mode: '0640'
+
+    - name: "[Sentinel] Déployer la configuration Sentinel sur le master"
+      ansible.builtin.template:
+        src: redis-sentinel.conf.j2
+        dest: /etc/redis-sentinel.conf
+        owner: redis
+        group: redis
+        mode: '0640'
+      vars:
+        monitor_ip: "127.0.0.1"
+      when: inventory_hostname in groups['redis_master']
+
+    - name: "[Sentinel] Déployer la configuration Sentinel sur les réplicas"
+      ansible.builtin.template:
+        src: redis-sentinel.conf.j2
+        dest: /etc/redis-sentinel.conf
+        owner: redis
+        group: redis
+        mode: '0640'
+      vars:
+        monitor_ip: "{{ master_ip }}"
+      when: inventory_hostname in groups['redis_replicas']
+
+    # ── Étape 5 : Firewall ────────────────────────────────────────────────────
+
+    - name: "[Firewall] Ouvrir le port Redis"
+      ansible.posix.firewalld:
+        port: "{{ redis_port }}/tcp"
+        zone: public
+        permanent: true
+        state: enabled
+      notify: Reload firewalld
+
+    - name: "[Firewall] Ouvrir le port Sentinel"
+      ansible.posix.firewalld:
+        port: "{{ sentinel_port }}/tcp"
+        zone: public
+        permanent: true
+        state: enabled
+      notify: Reload firewalld
+
+    # ── Étape 6 : Services ────────────────────────────────────────────────────
+    - name: "[Service] Activer et démarrer redis.service"
+      ansible.builtin.systemd:
+        name: redis
+        enabled: true
+        state: started
+
+    - name: "[Service] Activer et démarrer redis-sentinel.service"
+      ansible.builtin.systemd:
+        name: redis-sentinel
+        enabled: true
+        state: started
+
+    # ── Étape 7 : Vérification ────────────────────────────────────────────────
+
+    - name: "[Vérif] PING Redis"
+      ansible.builtin.command: redis-cli -p {{ redis_port }} -a {{ redis_password }} ping
+      register: redis_ping
+      changed_when: false
+      failed_when: redis_ping.stdout != "PONG"
+
+    - name: "[Vérif] Résultat PING Redis"
+      ansible.builtin.debug:
+        msg: "Redis répond : {{ redis_ping.stdout }} ✔"
+
+    - name: "[Vérif] PING Sentinel"
+      ansible.builtin.command: redis-cli -p {{ sentinel_port }} ping
+      register: sentinel_ping
+      changed_when: false
+      failed_when: sentinel_ping.stdout != "PONG"
+
+    - name: "[Vérif] Résultat PING Sentinel"
+      ansible.builtin.debug:
+        msg: "Sentinel répond : {{ sentinel_ping.stdout }} ✔"
+
+    - name: "[Vérif] Info Sentinel sur le master"
+      ansible.builtin.command: redis-cli -p {{ sentinel_port }} info sentinel
+      register: sentinel_info
+      changed_when: false
+      when: inventory_hostname in groups['redis_master']
+
+    - name: "[Vérif] Afficher les infos Sentinel"
+      ansible.builtin.debug:
+        msg: "{{ sentinel_info.stdout_lines }}"
+      when: inventory_hostname in groups['redis_master']
+
+  # ── Handlers ──────────────────────────────────────────────────────────────
+  handlers:
+    - name: Reload firewalld
+      ansible.builtin.systemd:
+        name: firewalld
+        state: reloaded
