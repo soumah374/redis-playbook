@@ -42,6 +42,28 @@ There is no single-test runner — `client-python/main.py` runs all 9 checks
 sequentially from `__main__`. To run one in isolation, import the module and call the
 individual `test_*()` function.
 
+Run the load test (montée en charge):
+```bash
+cd client-python
+pip install -r requirements.txt
+python3 loadtest.py                       # 50 workers, 30s, 20% writes (defaults)
+python3 loadtest.py -w 200 -d 60 -r 0.5   # heavier: 200 workers, 60s, 50% writes
+```
+
+`loadtest.py` spins up `--workers` threads that hammer the cluster through Sentinel for
+`--duration` seconds (writes → master, reads → replicas) and reports throughput (ops/s)
+and latency percentiles (p50/p95/p99). It does a Sentinel pre-flight check first, and
+cleans up its `loadtest:*` keys at the end unless `--no-cleanup` is passed. Exits 0 only
+if there were zero errors. Key flags: `-w/--workers`, `-d/--duration`,
+`-r/--write-ratio` (0.0–1.0), `-s/--value-size`, `-k/--keyspace`, `--ttl`, `--no-cleanup`.
+
+Run the real-time chat demo (`chat/`):
+```bash
+cd client-python/chat
+pip install -r requirements.txt   # adds Flask on top of redis
+python3 app.py                    # then open http://localhost:5000  (?room=foo for rooms)
+```
+
 ## Architecture
 
 - **`redis_sentinel_playbook.yml`** — single playbook, runs on the `redis_all` group.
@@ -74,6 +96,20 @@ individual `test_*()` function.
 - **`client-python/main.py`** — operational smoke test. Connection details
   (`SENTINELS`, `MASTER_NAME`, `REDIS_PASSWORD`, node IPs) are hardcoded near the top
   and must be kept in sync with `inventory.ini` and the playbook vars.
+
+- **`client-python/loadtest.py`** — concurrent load test. Threads route writes to the
+  master and reads to the replicas via `master_for`/`slave_for`, measuring ops/s and
+  latency percentiles. Shares the same hardcoded `SENTINELS`/`MASTER_NAME`/
+  `REDIS_PASSWORD` constants as `main.py` (same cross-file invariant — keep them in
+  sync). Throughput is GIL-bound since the workers are threads; for very high load run
+  several processes in parallel.
+
+- **`client-python/chat/`** — small real-time chat web app (Flask) demoing the cluster
+  via Redis Pub/Sub. `app.py` PUBLISHes messages to the master and streams them to
+  browsers over Server-Sent Events (`/stream`); recent history is kept in a Redis list
+  (`chat:history:<room>`, LPUSH + LTRIM to `HISTORY_MAX`). UI is a single template
+  (`templates/index.html`). Same hardcoded Sentinel constants as `main.py` — keep in
+  sync. Must run with `threaded=True` to serve concurrent SSE streams.
 
 ## Key cross-file invariants
 

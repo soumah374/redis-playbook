@@ -1,0 +1,561 @@
+[
+    {
+        "label": "json",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "json",
+        "description": "json",
+        "detail": "json",
+        "documentation": {}
+    },
+    {
+        "label": "time",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "time",
+        "description": "time",
+        "detail": "time",
+        "documentation": {}
+    },
+    {
+        "label": "Flask",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "Response",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "render_template",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "request",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "stream_with_context",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "redis",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "redis",
+        "description": "redis",
+        "detail": "redis",
+        "documentation": {}
+    },
+    {
+        "label": "Sentinel",
+        "importPath": "redis.sentinel",
+        "description": "redis.sentinel",
+        "isExtraImport": true,
+        "detail": "redis.sentinel",
+        "documentation": {}
+    },
+    {
+        "label": "Sentinel",
+        "importPath": "redis.sentinel",
+        "description": "redis.sentinel",
+        "isExtraImport": true,
+        "detail": "redis.sentinel",
+        "documentation": {}
+    },
+    {
+        "label": "Sentinel",
+        "importPath": "redis.sentinel",
+        "description": "redis.sentinel",
+        "isExtraImport": true,
+        "detail": "redis.sentinel",
+        "documentation": {}
+    },
+    {
+        "label": "argparse",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "argparse",
+        "description": "argparse",
+        "detail": "argparse",
+        "documentation": {}
+    },
+    {
+        "label": "random",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "random",
+        "description": "random",
+        "detail": "random",
+        "documentation": {}
+    },
+    {
+        "label": "statistics",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "statistics",
+        "description": "statistics",
+        "detail": "statistics",
+        "documentation": {}
+    },
+    {
+        "label": "string",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "string",
+        "description": "string",
+        "detail": "string",
+        "documentation": {}
+    },
+    {
+        "label": "sys",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "sys",
+        "description": "sys",
+        "detail": "sys",
+        "documentation": {}
+    },
+    {
+        "label": "threading",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "threading",
+        "description": "threading",
+        "detail": "threading",
+        "documentation": {}
+    },
+    {
+        "label": "master",
+        "kind": 2,
+        "importPath": "client-python.chat.app",
+        "description": "client-python.chat.app",
+        "peekOfCode": "def master():\n    return _sentinel.master_for(MASTER_NAME, socket_timeout=5, password=REDIS_PASSWORD)\ndef channel(room):\n    return f\"{CHANNEL_PREFIX}{room}\"\ndef history_key(room):\n    return f\"{HISTORY_PREFIX}{room}\"\n# ─── Pages ────────────────────────────────────────────────────────────────────\n@app.route(\"/\")\ndef index():\n    room = request.args.get(\"room\", \"general\")",
+        "detail": "client-python.chat.app",
+        "documentation": {}
+    },
+    {
+        "label": "channel",
+        "kind": 2,
+        "importPath": "client-python.chat.app",
+        "description": "client-python.chat.app",
+        "peekOfCode": "def channel(room):\n    return f\"{CHANNEL_PREFIX}{room}\"\ndef history_key(room):\n    return f\"{HISTORY_PREFIX}{room}\"\n# ─── Pages ────────────────────────────────────────────────────────────────────\n@app.route(\"/\")\ndef index():\n    room = request.args.get(\"room\", \"general\")\n    return render_template(\"index.html\", room=room)\n# ─── Historique récent du salon ──────────────────────────────────────────────",
+        "detail": "client-python.chat.app",
+        "documentation": {}
+    },
+    {
+        "label": "history_key",
+        "kind": 2,
+        "importPath": "client-python.chat.app",
+        "description": "client-python.chat.app",
+        "peekOfCode": "def history_key(room):\n    return f\"{HISTORY_PREFIX}{room}\"\n# ─── Pages ────────────────────────────────────────────────────────────────────\n@app.route(\"/\")\ndef index():\n    room = request.args.get(\"room\", \"general\")\n    return render_template(\"index.html\", room=room)\n# ─── Historique récent du salon ──────────────────────────────────────────────\n@app.route(\"/history\")\ndef history():",
+        "detail": "client-python.chat.app",
+        "documentation": {}
+    },
+    {
+        "label": "index",
+        "kind": 2,
+        "importPath": "client-python.chat.app",
+        "description": "client-python.chat.app",
+        "peekOfCode": "def index():\n    room = request.args.get(\"room\", \"general\")\n    return render_template(\"index.html\", room=room)\n# ─── Historique récent du salon ──────────────────────────────────────────────\n@app.route(\"/history\")\ndef history():\n    room = request.args.get(\"room\", \"general\")\n    raw = master().lrange(history_key(room), 0, HISTORY_MAX - 1)\n    # Stockés du plus récent au plus ancien → on inverse pour l'affichage.\n    messages = [json.loads(m) for m in reversed(raw)]",
+        "detail": "client-python.chat.app",
+        "documentation": {}
+    },
+    {
+        "label": "history",
+        "kind": 2,
+        "importPath": "client-python.chat.app",
+        "description": "client-python.chat.app",
+        "peekOfCode": "def history():\n    room = request.args.get(\"room\", \"general\")\n    raw = master().lrange(history_key(room), 0, HISTORY_MAX - 1)\n    # Stockés du plus récent au plus ancien → on inverse pour l'affichage.\n    messages = [json.loads(m) for m in reversed(raw)]\n    return {\"messages\": messages}\n# ─── Envoi d'un message ──────────────────────────────────────────────────────\n@app.route(\"/send\", methods=[\"POST\"])\ndef send():\n    data = request.get_json(force=True)",
+        "detail": "client-python.chat.app",
+        "documentation": {}
+    },
+    {
+        "label": "send",
+        "kind": 2,
+        "importPath": "client-python.chat.app",
+        "description": "client-python.chat.app",
+        "peekOfCode": "def send():\n    data = request.get_json(force=True)\n    user = (data.get(\"user\") or \"anon\").strip()[:32]\n    text = (data.get(\"text\") or \"\").strip()[:500]\n    room = (data.get(\"room\") or \"general\").strip()[:64]\n    if not text:\n        return {\"ok\": False, \"error\": \"message vide\"}, 400\n    msg = json.dumps({\"user\": user, \"text\": text, \"ts\": time.time()})\n    r = master()\n    pipe = r.pipeline()",
+        "detail": "client-python.chat.app",
+        "documentation": {}
+    },
+    {
+        "label": "stream",
+        "kind": 2,
+        "importPath": "client-python.chat.app",
+        "description": "client-python.chat.app",
+        "peekOfCode": "def stream():\n    room = request.args.get(\"room\", \"general\")\n    def event_stream():\n        # Chaque client SSE a son propre pubsub/connexion dédiée.\n        pubsub = master().pubsub()\n        pubsub.subscribe(channel(room))\n        try:\n            # Commentaire SSE initial : ouvre le flux côté navigateur.\n            yield \": connecté\\n\\n\"\n            last_ping = time.time()",
+        "detail": "client-python.chat.app",
+        "documentation": {}
+    },
+    {
+        "label": "SENTINELS",
+        "kind": 5,
+        "importPath": "client-python.chat.app",
+        "description": "client-python.chat.app",
+        "peekOfCode": "SENTINELS = [\n    (\"192.168.1.158\", 26379),  # master\n    (\"192.168.1.140\", 26379),  # replica1\n    (\"192.168.1.159\", 26379),  # replica2\n]\nMASTER_NAME    = \"computemaster\"\nREDIS_PASSWORD = \"Securep@55Here\"\nCHANNEL_PREFIX = \"chat:channel:\"   # canal Pub/Sub par salon\nHISTORY_PREFIX = \"chat:history:\"   # liste d'historique par salon\nHISTORY_MAX    = 50                # nb de messages conservés par salon",
+        "detail": "client-python.chat.app",
+        "documentation": {}
+    },
+    {
+        "label": "REDIS_PASSWORD",
+        "kind": 5,
+        "importPath": "client-python.chat.app",
+        "description": "client-python.chat.app",
+        "peekOfCode": "REDIS_PASSWORD = \"Securep@55Here\"\nCHANNEL_PREFIX = \"chat:channel:\"   # canal Pub/Sub par salon\nHISTORY_PREFIX = \"chat:history:\"   # liste d'historique par salon\nHISTORY_MAX    = 50                # nb de messages conservés par salon\napp = Flask(__name__)\n# Connexion master partagée pour PUBLISH / historique (le pool gère le reste).\n_sentinel = Sentinel(SENTINELS, socket_timeout=5, password=REDIS_PASSWORD)\ndef master():\n    return _sentinel.master_for(MASTER_NAME, socket_timeout=5, password=REDIS_PASSWORD)\ndef channel(room):",
+        "detail": "client-python.chat.app",
+        "documentation": {}
+    },
+    {
+        "label": "CHANNEL_PREFIX",
+        "kind": 5,
+        "importPath": "client-python.chat.app",
+        "description": "client-python.chat.app",
+        "peekOfCode": "CHANNEL_PREFIX = \"chat:channel:\"   # canal Pub/Sub par salon\nHISTORY_PREFIX = \"chat:history:\"   # liste d'historique par salon\nHISTORY_MAX    = 50                # nb de messages conservés par salon\napp = Flask(__name__)\n# Connexion master partagée pour PUBLISH / historique (le pool gère le reste).\n_sentinel = Sentinel(SENTINELS, socket_timeout=5, password=REDIS_PASSWORD)\ndef master():\n    return _sentinel.master_for(MASTER_NAME, socket_timeout=5, password=REDIS_PASSWORD)\ndef channel(room):\n    return f\"{CHANNEL_PREFIX}{room}\"",
+        "detail": "client-python.chat.app",
+        "documentation": {}
+    },
+    {
+        "label": "HISTORY_PREFIX",
+        "kind": 5,
+        "importPath": "client-python.chat.app",
+        "description": "client-python.chat.app",
+        "peekOfCode": "HISTORY_PREFIX = \"chat:history:\"   # liste d'historique par salon\nHISTORY_MAX    = 50                # nb de messages conservés par salon\napp = Flask(__name__)\n# Connexion master partagée pour PUBLISH / historique (le pool gère le reste).\n_sentinel = Sentinel(SENTINELS, socket_timeout=5, password=REDIS_PASSWORD)\ndef master():\n    return _sentinel.master_for(MASTER_NAME, socket_timeout=5, password=REDIS_PASSWORD)\ndef channel(room):\n    return f\"{CHANNEL_PREFIX}{room}\"\ndef history_key(room):",
+        "detail": "client-python.chat.app",
+        "documentation": {}
+    },
+    {
+        "label": "app",
+        "kind": 5,
+        "importPath": "client-python.chat.app",
+        "description": "client-python.chat.app",
+        "peekOfCode": "app = Flask(__name__)\n# Connexion master partagée pour PUBLISH / historique (le pool gère le reste).\n_sentinel = Sentinel(SENTINELS, socket_timeout=5, password=REDIS_PASSWORD)\ndef master():\n    return _sentinel.master_for(MASTER_NAME, socket_timeout=5, password=REDIS_PASSWORD)\ndef channel(room):\n    return f\"{CHANNEL_PREFIX}{room}\"\ndef history_key(room):\n    return f\"{HISTORY_PREFIX}{room}\"\n# ─── Pages ────────────────────────────────────────────────────────────────────",
+        "detail": "client-python.chat.app",
+        "documentation": {}
+    },
+    {
+        "label": "_sentinel",
+        "kind": 5,
+        "importPath": "client-python.chat.app",
+        "description": "client-python.chat.app",
+        "peekOfCode": "_sentinel = Sentinel(SENTINELS, socket_timeout=5, password=REDIS_PASSWORD)\ndef master():\n    return _sentinel.master_for(MASTER_NAME, socket_timeout=5, password=REDIS_PASSWORD)\ndef channel(room):\n    return f\"{CHANNEL_PREFIX}{room}\"\ndef history_key(room):\n    return f\"{HISTORY_PREFIX}{room}\"\n# ─── Pages ────────────────────────────────────────────────────────────────────\n@app.route(\"/\")\ndef index():",
+        "detail": "client-python.chat.app",
+        "documentation": {}
+    },
+    {
+        "label": "Stats",
+        "kind": 6,
+        "importPath": "client-python.loadtest",
+        "description": "client-python.loadtest",
+        "peekOfCode": "class Stats:\n    def __init__(self):\n        self.lock = threading.Lock()\n        self.latencies = []      # en millisecondes\n        self.reads = 0\n        self.writes = 0\n        self.errors = 0\n    def record(self, latency_ms, op):\n        with self.lock:\n            self.latencies.append(latency_ms)",
+        "detail": "client-python.loadtest",
+        "documentation": {}
+    },
+    {
+        "label": "section",
+        "kind": 2,
+        "importPath": "client-python.loadtest",
+        "description": "client-python.loadtest",
+        "peekOfCode": "def section(title):\n    print(f\"\\n{CYAN}{'═'*55}{RESET}\")\n    print(f\"{CYAN}  {title}{RESET}\")\n    print(f\"{CYAN}{'═'*55}{RESET}\")\n# ─── Statistiques partagées entre workers ─────────────────────────────────────\nclass Stats:\n    def __init__(self):\n        self.lock = threading.Lock()\n        self.latencies = []      # en millisecondes\n        self.reads = 0",
+        "detail": "client-python.loadtest",
+        "documentation": {}
+    },
+    {
+        "label": "make_payload",
+        "kind": 2,
+        "importPath": "client-python.loadtest",
+        "description": "client-python.loadtest",
+        "peekOfCode": "def make_payload(size):\n    \"\"\"Génère une valeur aléatoire de `size` octets.\"\"\"\n    return \"\".join(random.choices(string.ascii_letters + string.digits, k=size))\ndef worker(worker_id, args, stats, deadline, stop_event, payload):\n    \"\"\"Boucle de charge exécutée par chaque thread.\"\"\"\n    # Pools de connexion gérés par Sentinel : un master (write) + un slave (read).\n    sentinel = Sentinel(SENTINELS, socket_timeout=args.timeout, password=REDIS_PASSWORD)\n    master = sentinel.master_for(MASTER_NAME, socket_timeout=args.timeout, password=REDIS_PASSWORD)\n    slave = sentinel.slave_for(MASTER_NAME, socket_timeout=args.timeout, password=REDIS_PASSWORD)\n    n = 0",
+        "detail": "client-python.loadtest",
+        "documentation": {}
+    },
+    {
+        "label": "worker",
+        "kind": 2,
+        "importPath": "client-python.loadtest",
+        "description": "client-python.loadtest",
+        "peekOfCode": "def worker(worker_id, args, stats, deadline, stop_event, payload):\n    \"\"\"Boucle de charge exécutée par chaque thread.\"\"\"\n    # Pools de connexion gérés par Sentinel : un master (write) + un slave (read).\n    sentinel = Sentinel(SENTINELS, socket_timeout=args.timeout, password=REDIS_PASSWORD)\n    master = sentinel.master_for(MASTER_NAME, socket_timeout=args.timeout, password=REDIS_PASSWORD)\n    slave = sentinel.slave_for(MASTER_NAME, socket_timeout=args.timeout, password=REDIS_PASSWORD)\n    n = 0\n    while not stop_event.is_set() and time.monotonic() < deadline:\n        key = f\"{KEY_PREFIX}{worker_id}:{n % args.keyspace}\"\n        is_write = random.random() < args.write_ratio",
+        "detail": "client-python.loadtest",
+        "documentation": {}
+    },
+    {
+        "label": "reporter",
+        "kind": 2,
+        "importPath": "client-python.loadtest",
+        "description": "client-python.loadtest",
+        "peekOfCode": "def reporter(stats, deadline, stop_event, interval):\n    \"\"\"Affiche un point de situation périodique (débit instantané).\"\"\"\n    last_total = 0\n    last_t = time.monotonic()\n    while not stop_event.is_set() and time.monotonic() < deadline:\n        time.sleep(interval)\n        with stats.lock:\n            total = stats.reads + stats.writes\n            errors = stats.errors\n        now = time.monotonic()",
+        "detail": "client-python.loadtest",
+        "documentation": {}
+    },
+    {
+        "label": "percentile",
+        "kind": 2,
+        "importPath": "client-python.loadtest",
+        "description": "client-python.loadtest",
+        "peekOfCode": "def percentile(sorted_data, pct):\n    if not sorted_data:\n        return 0.0\n    k = (len(sorted_data) - 1) * (pct / 100.0)\n    f = int(k)\n    c = min(f + 1, len(sorted_data) - 1)\n    if f == c:\n        return sorted_data[f]\n    return sorted_data[f] + (sorted_data[c] - sorted_data[f]) * (k - f)\ndef preflight():",
+        "detail": "client-python.loadtest",
+        "documentation": {}
+    },
+    {
+        "label": "preflight",
+        "kind": 2,
+        "importPath": "client-python.loadtest",
+        "description": "client-python.loadtest",
+        "peekOfCode": "def preflight():\n    \"\"\"Vérifie l'accès au cluster avant de lancer la charge.\"\"\"\n    section(\"Pré-vérification du cluster\")\n    try:\n        sentinel = Sentinel(SENTINELS, socket_timeout=3, password=REDIS_PASSWORD)\n        master = sentinel.discover_master(MASTER_NAME)\n        replicas = sentinel.discover_slaves(MASTER_NAME)\n        print(f\"  {GREEN}[✔]{RESET} Master détecté : {master[0]}:{master[1]}\")\n        print(f\"  {GREEN}[✔]{RESET} {len(replicas)} réplica(s) détecté(s)\")\n        return True",
+        "detail": "client-python.loadtest",
+        "documentation": {}
+    },
+    {
+        "label": "cleanup",
+        "kind": 2,
+        "importPath": "client-python.loadtest",
+        "description": "client-python.loadtest",
+        "peekOfCode": "def cleanup(args):\n    \"\"\"Supprime les clés de test générées.\"\"\"\n    try:\n        sentinel = Sentinel(SENTINELS, socket_timeout=5, password=REDIS_PASSWORD)\n        master = sentinel.master_for(MASTER_NAME, socket_timeout=5, password=REDIS_PASSWORD)\n        deleted = 0\n        for key in master.scan_iter(match=f\"{KEY_PREFIX}*\", count=500):\n            master.delete(key)\n            deleted += 1\n        print(f\"  {GREEN}[✔]{RESET} {deleted} clé(s) de test supprimée(s)\")",
+        "detail": "client-python.loadtest",
+        "documentation": {}
+    },
+    {
+        "label": "run",
+        "kind": 2,
+        "importPath": "client-python.loadtest",
+        "description": "client-python.loadtest",
+        "peekOfCode": "def run(args):\n    stats = Stats()\n    stop_event = threading.Event()\n    payload = make_payload(args.value_size)\n    deadline = time.monotonic() + args.duration\n    section(f\"Montée en charge — {args.workers} workers × {args.duration}s\")\n    print(f\"  Ratio écriture/lecture : {int(args.write_ratio*100)}% / {int((1-args.write_ratio)*100)}%\")\n    print(f\"  Taille des valeurs     : {args.value_size} octets\")\n    print(f\"  Keyspace par worker    : {args.keyspace} clés\\n\")\n    threads = []",
+        "detail": "client-python.loadtest",
+        "documentation": {}
+    },
+    {
+        "label": "print_summary",
+        "kind": 2,
+        "importPath": "client-python.loadtest",
+        "description": "client-python.loadtest",
+        "peekOfCode": "def print_summary(stats, elapsed):\n    section(\"Résultats\")\n    latencies = sorted(stats.latencies)\n    total = stats.reads + stats.writes\n    throughput = total / elapsed if elapsed > 0 else 0\n    print(f\"  Durée réelle      : {elapsed:.1f} s\")\n    print(f\"  Opérations totales: {total}  ({stats.writes} écritures, {stats.reads} lectures)\")\n    print(f\"  Erreurs           : {stats.errors}\")\n    print(f\"  Débit             : {GREEN}{throughput:.0f} ops/s{RESET}\")\n    if latencies:",
+        "detail": "client-python.loadtest",
+        "documentation": {}
+    },
+    {
+        "label": "parse_args",
+        "kind": 2,
+        "importPath": "client-python.loadtest",
+        "description": "client-python.loadtest",
+        "peekOfCode": "def parse_args():\n    p = argparse.ArgumentParser(description=\"Test de montée en charge Redis HA + Sentinel\")\n    p.add_argument(\"-w\", \"--workers\", type=int, default=50, help=\"Nombre de threads concurrents (def: 50)\")\n    p.add_argument(\"-d\", \"--duration\", type=float, default=30, help=\"Durée du test en secondes (def: 30)\")\n    p.add_argument(\"-r\", \"--write-ratio\", type=float, default=0.2,\n                   help=\"Proportion d'écritures entre 0.0 et 1.0 (def: 0.2)\")\n    p.add_argument(\"-s\", \"--value-size\", type=int, default=128, help=\"Taille des valeurs en octets (def: 128)\")\n    p.add_argument(\"-k\", \"--keyspace\", type=int, default=1000, help=\"Nombre de clés distinctes par worker (def: 1000)\")\n    p.add_argument(\"--ttl\", type=int, default=300, help=\"TTL des clés écrites en secondes (def: 300)\")\n    p.add_argument(\"--timeout\", type=float, default=3, help=\"Socket timeout en secondes (def: 3)\")",
+        "detail": "client-python.loadtest",
+        "documentation": {}
+    },
+    {
+        "label": "SENTINELS",
+        "kind": 5,
+        "importPath": "client-python.loadtest",
+        "description": "client-python.loadtest",
+        "peekOfCode": "SENTINELS = [\n    (\"192.168.1.158\", 26379),  # master\n    (\"192.168.1.140\", 26379),  # replica1\n    (\"192.168.1.159\", 26379),  # replica2\n]\nMASTER_NAME    = \"computemaster\"\nREDIS_PASSWORD = \"Securep@55Here\"\nKEY_PREFIX = \"loadtest:\"\n# ─── Couleurs terminal ────────────────────────────────────────────────────────\nGREEN  = \"\\033[92m\"",
+        "detail": "client-python.loadtest",
+        "documentation": {}
+    },
+    {
+        "label": "REDIS_PASSWORD",
+        "kind": 5,
+        "importPath": "client-python.loadtest",
+        "description": "client-python.loadtest",
+        "peekOfCode": "REDIS_PASSWORD = \"Securep@55Here\"\nKEY_PREFIX = \"loadtest:\"\n# ─── Couleurs terminal ────────────────────────────────────────────────────────\nGREEN  = \"\\033[92m\"\nRED    = \"\\033[91m\"\nYELLOW = \"\\033[93m\"\nCYAN   = \"\\033[96m\"\nRESET  = \"\\033[0m\"\ndef section(title):\n    print(f\"\\n{CYAN}{'═'*55}{RESET}\")",
+        "detail": "client-python.loadtest",
+        "documentation": {}
+    },
+    {
+        "label": "KEY_PREFIX",
+        "kind": 5,
+        "importPath": "client-python.loadtest",
+        "description": "client-python.loadtest",
+        "peekOfCode": "KEY_PREFIX = \"loadtest:\"\n# ─── Couleurs terminal ────────────────────────────────────────────────────────\nGREEN  = \"\\033[92m\"\nRED    = \"\\033[91m\"\nYELLOW = \"\\033[93m\"\nCYAN   = \"\\033[96m\"\nRESET  = \"\\033[0m\"\ndef section(title):\n    print(f\"\\n{CYAN}{'═'*55}{RESET}\")\n    print(f\"{CYAN}  {title}{RESET}\")",
+        "detail": "client-python.loadtest",
+        "documentation": {}
+    },
+    {
+        "label": "YELLOW",
+        "kind": 5,
+        "importPath": "client-python.loadtest",
+        "description": "client-python.loadtest",
+        "peekOfCode": "YELLOW = \"\\033[93m\"\nCYAN   = \"\\033[96m\"\nRESET  = \"\\033[0m\"\ndef section(title):\n    print(f\"\\n{CYAN}{'═'*55}{RESET}\")\n    print(f\"{CYAN}  {title}{RESET}\")\n    print(f\"{CYAN}{'═'*55}{RESET}\")\n# ─── Statistiques partagées entre workers ─────────────────────────────────────\nclass Stats:\n    def __init__(self):",
+        "detail": "client-python.loadtest",
+        "documentation": {}
+    },
+    {
+        "label": "ok",
+        "kind": 2,
+        "importPath": "client-python.main",
+        "description": "client-python.main",
+        "peekOfCode": "def ok(msg):\n    global passed\n    passed += 1\n    print(f\"  {GREEN}[✔] PASS{RESET} — {msg}\")\ndef ko(msg, err=\"\"):\n    global failed\n    failed += 1\n    detail = f\" ({err})\" if err else \"\"\n    print(f\"  {RED}[✘] FAIL{RESET} — {msg}{detail}\")\ndef section(title):",
+        "detail": "client-python.main",
+        "documentation": {}
+    },
+    {
+        "label": "ko",
+        "kind": 2,
+        "importPath": "client-python.main",
+        "description": "client-python.main",
+        "peekOfCode": "def ko(msg, err=\"\"):\n    global failed\n    failed += 1\n    detail = f\" ({err})\" if err else \"\"\n    print(f\"  {RED}[✘] FAIL{RESET} — {msg}{detail}\")\ndef section(title):\n    print(f\"\\n{CYAN}{'═'*55}{RESET}\")\n    print(f\"{CYAN}  {title}{RESET}\")\n    print(f\"{CYAN}{'═'*55}{RESET}\")\n# ─── Test 1 : Connexion directe à chaque nœud Redis ──────────────────────────",
+        "detail": "client-python.main",
+        "documentation": {}
+    },
+    {
+        "label": "section",
+        "kind": 2,
+        "importPath": "client-python.main",
+        "description": "client-python.main",
+        "peekOfCode": "def section(title):\n    print(f\"\\n{CYAN}{'═'*55}{RESET}\")\n    print(f\"{CYAN}  {title}{RESET}\")\n    print(f\"{CYAN}{'═'*55}{RESET}\")\n# ─── Test 1 : Connexion directe à chaque nœud Redis ──────────────────────────\ndef test_direct_connections():\n    section(\"Test 1 : Connexion directe à chaque nœud Redis\")\n    nodes = [\n        (\"192.168.1.158\", \"master\"),\n        (\"192.168.1.140\", \"replica1\"),",
+        "detail": "client-python.main",
+        "documentation": {}
+    },
+    {
+        "label": "test_direct_connections",
+        "kind": 2,
+        "importPath": "client-python.main",
+        "description": "client-python.main",
+        "peekOfCode": "def test_direct_connections():\n    section(\"Test 1 : Connexion directe à chaque nœud Redis\")\n    nodes = [\n        (\"192.168.1.158\", \"master\"),\n        (\"192.168.1.140\", \"replica1\"),\n        (\"192.168.1.159\", \"replica2\"),\n    ]\n    for ip, role in nodes:\n        try:\n            r = redis.Redis(host=ip, port=REDIS_PORT, password=REDIS_PASSWORD, socket_timeout=3)",
+        "detail": "client-python.main",
+        "documentation": {}
+    },
+    {
+        "label": "test_sentinel_connections",
+        "kind": 2,
+        "importPath": "client-python.main",
+        "description": "client-python.main",
+        "peekOfCode": "def test_sentinel_connections():\n    section(\"Test 2 : Connexion aux Sentinels (port 26379)\")\n    for ip, port in SENTINELS:\n        try:\n            r = redis.Redis(host=ip, port=port, socket_timeout=3)\n            pong = r.ping()\n            ok(f\"Sentinel {ip}:{port} → PONG\")\n        except Exception as e:\n            ko(f\"Sentinel {ip}:{port}\", str(e))\n# ─── Test 3 : Détection du master via Sentinel ────────────────────────────────",
+        "detail": "client-python.main",
+        "documentation": {}
+    },
+    {
+        "label": "test_sentinel_master_discovery",
+        "kind": 2,
+        "importPath": "client-python.main",
+        "description": "client-python.main",
+        "peekOfCode": "def test_sentinel_master_discovery():\n    section(\"Test 3 : Détection du master via Sentinel\")\n    try:\n        sentinel = Sentinel(SENTINELS, socket_timeout=3, password=REDIS_PASSWORD)\n        master = sentinel.discover_master(MASTER_NAME)\n        ok(f\"Master détecté : {master[0]}:{master[1]}\")\n        return sentinel\n    except Exception as e:\n        ko(\"Détection du master via Sentinel\", str(e))\n        return None",
+        "detail": "client-python.main",
+        "documentation": {}
+    },
+    {
+        "label": "test_sentinel_replica_discovery",
+        "kind": 2,
+        "importPath": "client-python.main",
+        "description": "client-python.main",
+        "peekOfCode": "def test_sentinel_replica_discovery():\n    section(\"Test 4 : Détection des réplicas via Sentinel\")\n    try:\n        sentinel = Sentinel(SENTINELS, socket_timeout=3, password=REDIS_PASSWORD)\n        replicas = sentinel.discover_slaves(MASTER_NAME)\n        if replicas:\n            for r in replicas:\n                ok(f\"Réplica détecté : {r[0]}:{r[1]}\")\n        else:\n            ko(\"Aucun réplica détecté par Sentinel\")",
+        "detail": "client-python.main",
+        "documentation": {}
+    },
+    {
+        "label": "test_write_read",
+        "kind": 2,
+        "importPath": "client-python.main",
+        "description": "client-python.main",
+        "peekOfCode": "def test_write_read():\n    section(\"Test 5 : Écriture / Lecture sur le master\")\n    try:\n        sentinel = Sentinel(SENTINELS, socket_timeout=3, password=REDIS_PASSWORD)\n        master = sentinel.master_for(MASTER_NAME, socket_timeout=3)\n        # Écriture\n        master.set(\"redis_ha_test\", \"hello_sentinel\", ex=60)\n        ok(\"Écriture clé 'redis_ha_test' sur le master\")\n        # Lecture depuis le master\n        val = master.get(\"redis_ha_test\").decode()",
+        "detail": "client-python.main",
+        "documentation": {}
+    },
+    {
+        "label": "test_read_from_replicas",
+        "kind": 2,
+        "importPath": "client-python.main",
+        "description": "client-python.main",
+        "peekOfCode": "def test_read_from_replicas():\n    section(\"Test 6 : Lecture depuis les réplicas\")\n    try:\n        sentinel = Sentinel(SENTINELS, socket_timeout=3, password=REDIS_PASSWORD)\n        slave = sentinel.slave_for(MASTER_NAME, socket_timeout=3)\n        time.sleep(0.5)  # laisser le temps à la réplication\n        val = slave.get(\"redis_ha_test\")\n        if val:\n            ok(f\"Lecture depuis réplica → '{val.decode()}'\")\n        else:",
+        "detail": "client-python.main",
+        "documentation": {}
+    },
+    {
+        "label": "test_roles",
+        "kind": 2,
+        "importPath": "client-python.main",
+        "description": "client-python.main",
+        "peekOfCode": "def test_roles():\n    section(\"Test 7 : Vérification du rôle de chaque nœud\")\n    nodes = [\n        (\"192.168.1.158\", \"master\"),\n        (\"192.168.1.140\", \"replica1\"),\n        (\"192.168.1.159\", \"replica2\"),\n    ]\n    for ip, name in nodes:\n        try:\n            r = redis.Redis(host=ip, port=REDIS_PORT, password=REDIS_PASSWORD, socket_timeout=3)",
+        "detail": "client-python.main",
+        "documentation": {}
+    },
+    {
+        "label": "test_replication",
+        "kind": 2,
+        "importPath": "client-python.main",
+        "description": "client-python.main",
+        "peekOfCode": "def test_replication():\n    section(\"Test 8 : État de la réplication\")\n    try:\n        r = redis.Redis(host=\"192.168.1.158\", port=REDIS_PORT, password=REDIS_PASSWORD, socket_timeout=3)\n        info = r.info(\"replication\")\n        nb_replicas = info.get(\"connected_slaves\", 0)\n        if nb_replicas >= 1:\n            ok(f\"{nb_replicas} réplica(s) connecté(s) au master\")\n            for i in range(nb_replicas):\n                slave_info = info.get(f\"slave{i}\", {})",
+        "detail": "client-python.main",
+        "documentation": {}
+    },
+    {
+        "label": "test_cleanup",
+        "kind": 2,
+        "importPath": "client-python.main",
+        "description": "client-python.main",
+        "peekOfCode": "def test_cleanup():\n    section(\"Test 9 : Nettoyage des clés de test\")\n    try:\n        sentinel = Sentinel(SENTINELS, socket_timeout=3, password=REDIS_PASSWORD)\n        master = sentinel.master_for(MASTER_NAME, socket_timeout=3)\n        master.delete(\"redis_ha_test\")\n        ok(\"Clé 'redis_ha_test' supprimée\")\n    except Exception as e:\n        ko(\"Nettoyage\", str(e))\n# ─── Résumé ───────────────────────────────────────────────────────────────────",
+        "detail": "client-python.main",
+        "documentation": {}
+    },
+    {
+        "label": "print_summary",
+        "kind": 2,
+        "importPath": "client-python.main",
+        "description": "client-python.main",
+        "peekOfCode": "def print_summary():\n    total = passed + failed\n    print(f\"\\n{CYAN}{'═'*55}{RESET}\")\n    print(f\"{CYAN}  Résumé des tests{RESET}\")\n    print(f\"{CYAN}{'═'*55}{RESET}\")\n    print(f\"  Total   : {total}\")\n    print(f\"  {GREEN}Réussis : {passed}{RESET}\")\n    print(f\"  {RED}Échoués : {failed}{RESET}\")\n    if failed == 0:\n        print(f\"\\n  {GREEN}✔ Cluster Redis HA opérationnel !{RESET}\\n\")",
+        "detail": "client-python.main",
+        "documentation": {}
+    },
+    {
+        "label": "SENTINELS",
+        "kind": 5,
+        "importPath": "client-python.main",
+        "description": "client-python.main",
+        "peekOfCode": "SENTINELS = [\n    (\"192.168.1.158\", 26379),  # master\n    (\"192.168.1.140\", 26379),  # replica1\n    (\"192.168.1.159\", 26379),  # replica2\n]\nMASTER_NAME   = \"computemaster\"\nREDIS_PASSWORD = \"Securep@55Here\"\nREDIS_PORT     = 6379\n# ─── Couleurs terminal ────────────────────────────────────────────────────────\nGREEN  = \"\\033[92m\"",
+        "detail": "client-python.main",
+        "documentation": {}
+    },
+    {
+        "label": "REDIS_PASSWORD",
+        "kind": 5,
+        "importPath": "client-python.main",
+        "description": "client-python.main",
+        "peekOfCode": "REDIS_PASSWORD = \"Securep@55Here\"\nREDIS_PORT     = 6379\n# ─── Couleurs terminal ────────────────────────────────────────────────────────\nGREEN  = \"\\033[92m\"\nRED    = \"\\033[91m\"\nYELLOW = \"\\033[93m\"\nCYAN   = \"\\033[96m\"\nRESET  = \"\\033[0m\"\npassed = 0\nfailed = 0",
+        "detail": "client-python.main",
+        "documentation": {}
+    },
+    {
+        "label": "YELLOW",
+        "kind": 5,
+        "importPath": "client-python.main",
+        "description": "client-python.main",
+        "peekOfCode": "YELLOW = \"\\033[93m\"\nCYAN   = \"\\033[96m\"\nRESET  = \"\\033[0m\"\npassed = 0\nfailed = 0\ndef ok(msg):\n    global passed\n    passed += 1\n    print(f\"  {GREEN}[✔] PASS{RESET} — {msg}\")\ndef ko(msg, err=\"\"):",
+        "detail": "client-python.main",
+        "documentation": {}
+    },
+    {
+        "label": "passed",
+        "kind": 5,
+        "importPath": "client-python.main",
+        "description": "client-python.main",
+        "peekOfCode": "passed = 0\nfailed = 0\ndef ok(msg):\n    global passed\n    passed += 1\n    print(f\"  {GREEN}[✔] PASS{RESET} — {msg}\")\ndef ko(msg, err=\"\"):\n    global failed\n    failed += 1\n    detail = f\" ({err})\" if err else \"\"",
+        "detail": "client-python.main",
+        "documentation": {}
+    },
+    {
+        "label": "failed",
+        "kind": 5,
+        "importPath": "client-python.main",
+        "description": "client-python.main",
+        "peekOfCode": "failed = 0\ndef ok(msg):\n    global passed\n    passed += 1\n    print(f\"  {GREEN}[✔] PASS{RESET} — {msg}\")\ndef ko(msg, err=\"\"):\n    global failed\n    failed += 1\n    detail = f\" ({err})\" if err else \"\"\n    print(f\"  {RED}[✘] FAIL{RESET} — {msg}{detail}\")",
+        "detail": "client-python.main",
+        "documentation": {}
+    }
+]
